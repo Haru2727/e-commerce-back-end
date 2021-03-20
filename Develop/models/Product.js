@@ -7,6 +7,7 @@ const sequelize = require('../config/connection');
 class Product extends Model { }
 
 // set up fields and rules for Product model
+try{
 Product.init(
   {
     // define columns
@@ -15,7 +16,7 @@ Product.init(
       primaryKey: true,
       allowNull: false,
       autoIncrement: true
-    },
+    }, 
     product_name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -51,5 +52,7 @@ Product.init(
     modelName: 'product',
   }
 );
-
+} catch (err) {
+  console.log(err);
+}
 module.exports = Product;
