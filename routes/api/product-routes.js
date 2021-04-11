@@ -27,11 +27,11 @@ router.get('/:id', async (req, res) => {
   // be sure to include its associated Category and Tag data
   try {
     const findOneProd = await Product.findByPk(req.params.id, {
-      include: [Tag],
+      include: [{ model: Tag, through: ProductTag, as: 'product_id' }]
     });
     if (!findOneProd) {
       res.status(404).json({ message: 'This product doesnt exsist' });
-      return;
+      // return;
     }
     res.status(200).json(findOneProd);
   } catch (err) {
@@ -58,7 +58,7 @@ router.post('/', (req, res) => {
   })
     .then((product) => {
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
-      if (req.body.tagIds.length) {
+      if (req.body.tagIds) {
         const productTagIdArr = req.body.tagIds.map((tag_id) => {
           return {
             product_id: product.id,
@@ -121,6 +121,20 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   // delete one product by its `id` value
+  try {
+    const deleteProduct = await Product.destroy({
+      where: { id: req.params.id }
+    });
+    if (!deleteProduct) {
+      res.status(404).json({ message: "Cannot Delete" });
+      return;
+    }
+    res.status(200).json(deleteProduct);
+    console.log("Deleteing: ", deleteProduct);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+
 });
 
 module.exports = router;
